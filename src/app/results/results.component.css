@@ -1,0 +1,26 @@
+:host {
+  display: flex;
+}
+
+.test-result {
+  --diameter: 30px;
+  --background-shadow: -1px -1px var(--shadow-colour);
+  --highlight: inset 2px 3px 2px hsla(0, 0%, 100%, .6);
+  width: var(--diameter);
+  height: var(--diameter);
+  border-radius: 50%;
+  border: 2px solid #333;
+  margin-right: 5px;
+  background-color: #999;
+  box-shadow: inset 2px 3px #666, var(--background-shadow);
+}
+
+.test-result.passing {
+  background-color: hsl(100, 50%, 50%);
+  box-shadow: var(--highlight), var(--background-shadow);
+}
+
+.test-result.failing {
+  background-color: hsl(0, 50%, 50%);
+  box-shadow: var(--highlight), var(--background-shadow);
+}

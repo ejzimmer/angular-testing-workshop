@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  --blue-hue: 200;
+  --shadow-colour: hsla(0, 0%, 20%, .4);
+  font-family: Arial, Helvetica, sans-serif;
+  background: hsl(var(--blue-hue), 50%, 60%);
+}

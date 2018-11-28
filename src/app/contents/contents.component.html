@@ -1,3 +1,6 @@
-<p>
-  contents works!
-</p>
+<ul>
+  <li *ngFor="let chapter of chapters">
+    <div class="title">{{ chapter.title }}</div>
+    <app-results></app-results>
+  </li>
+</ul>
