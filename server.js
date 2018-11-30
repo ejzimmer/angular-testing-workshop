@@ -3,7 +3,16 @@ const fs = require('fs');
 
 const app = express();
 
-const connections = [];
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
+const resultsFile = 'src/karma-result.json';
+
+let connection;
 
 app.use((req, res, next) => {
   res.sseSetup = () => {
@@ -23,13 +32,17 @@ app.use((req, res, next) => {
 
 app.get('/connect', (req, res) => {
   res.sseSetup();
-  connections.push(res);
+  connection = res;
+  const results = fs.readFileSync(resultsFile, 'utf8');
+  connection.sseSend(results);
 });
 
 app.listen(7000, () => {
   console.log('Listening on port 7000...');
 });
 
-fs.watchFile('src/karma-result.json', () => {
-  connections.forEach(connection => connection.sseSend('boo'));
+fs.watchFile(resultsFile, () => {
+  console.log('File changed... pushing changes');
+  const results = fs.readFileSync(resultsFile, 'utf8');
+  connection.sseSend(results);
 });

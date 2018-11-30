@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-results',
@@ -7,9 +7,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ResultsComponent implements OnInit {
 
+  @Input() results: any;
+
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit() { 
   }
 
+  getStatus(test) {
+    if (test.pending || test.skipped || test.executedExpectationsCount === 0) {
+      return;
+    }
+
+    return test.success ? 'passing' : 'failing';
+  }
 }

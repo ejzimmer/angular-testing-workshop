@@ -1,4 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { ResultsService } from '../results.service';
+
+type Chapter = {
+  title: string;
+  suite?: string;
+  results?: any;
+  link?: string;
+}
 
 @Component({
   selector: 'app-contents',
@@ -6,13 +14,20 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./contents.component.css']
 })
 export class ContentsComponent implements OnInit {
-  chapters = [
-    { title: 'A service' },
+  chapters: Chapter[] = [
+    { 
+      title: 'A service',
+      suite: 'HighScoreService',
+      link: 'service-test'
+    },
     { title: 'A service with dependencies' },
     { title: 'A service that uses HTTP' },
     { title: 'A service that does something asynchronously' },
     { title: 'A service with Observables' },
-    { title: 'A component' },
+    { 
+      title: 'A component',
+      suite: 'AppComponent'
+    },
     { title: 'A component with dependencies' },
     { title: 'A component with other components inside' },
     { title: 'A component with inputs and outputs' },
@@ -20,11 +35,13 @@ export class ContentsComponent implements OnInit {
     { title: 'A component with Observables' }
   ]
 
-  constructor() { 
-    console.log(this.chapters)
-  }
+  constructor(private resultsService: ResultsService) { }
 
   ngOnInit() {
+    this.resultsService.results.subscribe((result) => {
+      this.chapters.forEach((chapter) => { 
+        chapter.results = result[`"${chapter.suite}"`];
+      });
+    });
   }
-
 }

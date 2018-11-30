@@ -22,7 +22,7 @@ module.exports = function (config) {
       fixWebpackSourcePaths: true
     },
     jsonReporter: {
-      stdOut: false,
+      stdout: false,
       outputFile: 'karma-result.json',
     },
     reporters: ['progress', 'kjhtml', 'json'],
@@ -30,7 +30,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chromium'],
+    browsers: ['Chrome'],
     singleRun: true
   });
 };

@@ -17,6 +17,10 @@ li {
               -2px -1px 1px var(--shadow-colour);
 }
 
+li.pending {
+  background-color: hsl(var(--blue-hue), 20%, 70%);
+}
+
 .title {
   flex-grow: 1;
   margin-right: 1em;

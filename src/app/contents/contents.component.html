@@ -1,6 +1,6 @@
 <ul>
-  <li *ngFor="let chapter of chapters">
+  <li *ngFor="let chapter of chapters" [ngClass]="{ pending: !chapter.link }">
     <div class="title">{{ chapter.title }}</div>
-    <app-results></app-results>
+    <app-results [results]="chapter.results"></app-results>
   </li>
 </ul>

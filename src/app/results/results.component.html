@@ -1,5 +1,9 @@
-<div class="test-result passing"></div>
+<div *ngFor="let test of results" class="test-result {{ getStatus(test) }}">
+</div>
+
+
+<!-- <div class="test-result passing"></div>
 <div class="test-result failing"></div>
 <div class="test-result"></div>
 <div class="test-result"></div>
-<div class="test-result"></div>
+<div class="test-result"></div> -->
