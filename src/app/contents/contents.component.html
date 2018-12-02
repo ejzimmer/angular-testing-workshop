@@ -1,6 +1,9 @@
+<app-score></app-score>
 <ul>
-  <li *ngFor="let chapter of chapters" [ngClass]="{ pending: !chapter.link }">
-    <div class="title">{{ chapter.title }}</div>
-    <app-results [results]="chapter.results"></app-results>
+  <li *ngFor="let chapter of chapters">
+    <a routerLink="{{ chapter.link }}" [ngClass]="{ pending: !chapter.link }">
+      <div class="title">{{ chapter.title }}</div>
+      <app-results [suite]="chapter.suite" [tests]="chapter.tests" [results]="chapter.results"></app-results>
+    </a>
   </li>
 </ul>

@@ -7,6 +7,7 @@ import { ContentsComponent } from './contents/contents.component';
 import { ResultsComponent } from './results/results.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ServiceTestComponent } from './service-test/service-test.component';
+import { ScoreComponent } from './score/score.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { ServiceTestComponent } from './service-test/service-test.component';
     ContentsComponent,
     ResultsComponent,
     ServiceTestComponent,
+    ScoreComponent,
   ],
   imports: [
     BrowserModule,

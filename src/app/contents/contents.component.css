@@ -4,20 +4,30 @@ ul {
 }
 
 li {
-  display: flex;
   width: 100%;
-  border: 1px solid #333;
+}
+a {
+  display: flex;
+  align-items: center;
+  color: var(--black);
+  text-decoration: none;
+  border: 1px solid var(--black);
   border-radius: 5px;
   padding: 1em;
   margin: 1em 0;
-  align-items: center;
   background-color: hsl(var(--blue-hue), 80%, 70%);
   box-shadow: inset 4px 2px 2px hsl(var(--blue-hue), 80%, 30%), 
               inset -4px -2px 2px hsl(var(--blue-hue), 80%, 90%),
               -2px -1px 1px var(--shadow-colour);
+  transition: box-shadow .2s;
 }
-
-li.pending {
+a:active {
+  background-color: hsl(var(--blue-hue), 80%, 30%);
+  box-shadow: inset 4px 2px 2px hsl(var(--blue-hue), 80%, 10%), 
+              inset -4px -2px 2px hsl(var(--blue-hue), 80%, 30%),
+              -2px -1px 1px var(--shadow-colour);;
+}
+a.pending {
   background-color: hsl(var(--blue-hue), 20%, 70%);
 }
 

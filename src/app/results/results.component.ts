@@ -8,6 +8,8 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ResultsComponent implements OnInit {
 
   @Input() results: any;
+  @Input() suite: string;
+  @Input() tests: string[];
 
   constructor() { }
 
@@ -15,10 +17,14 @@ export class ResultsComponent implements OnInit {
   }
 
   getStatus(test) {
-    if (test.pending || test.skipped || test.executedExpectationsCount === 0) {
+    const result = this.results && this.results.find(result => result.fullName === `${this.suite} ${test}`);
+    if (!result) {
+      return;
+    }
+    if (result.pending || result.skipped || result.executedExpectationsCount === 0) {
       return;
     }
 
-    return test.success ? 'passing' : 'failing';
+    return result.success ? 'passing' : 'failing';
   }
 }
