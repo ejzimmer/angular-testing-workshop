@@ -8,6 +8,8 @@ import { ResultsComponent } from './results/results.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ServiceTestComponent } from './service-test/service-test.component';
 import { ScoreComponent } from './score/score.component';
+import { ServiceDependencyTestComponent } from './service-dependency-test/service-dependency-test.component';
+import { ServiceHttpTestComponent } from './service-http-test/service-http-test.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +18,8 @@ import { ScoreComponent } from './score/score.component';
     ResultsComponent,
     ServiceTestComponent,
     ScoreComponent,
+    ServiceDependencyTestComponent,
+    ServiceHttpTestComponent,
   ],
   imports: [
     BrowserModule,

@@ -30,7 +30,14 @@ export class ContentsComponent implements OnInit {
         'should not set the score if the current score is lower than the previous high score'
       ]
     },
-    { title: 'A service with dependencies' },
+    {
+      title: 'A service with dependencies',
+      suite: '',
+      link: 'service-dependency-test',
+      tests: [
+        
+      ]
+    },
     { title: 'A service that uses HTTP' },
     { title: 'A service that does something asynchronously' },
     { title: 'A service with Observables' },

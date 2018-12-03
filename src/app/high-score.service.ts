@@ -18,4 +18,8 @@ export class HighScoreService {
   get score() {
     return Number(localStorage.getItem(this.key)) || 0;
   }
+
+  getSomeStuff() {
+    return 'foo';
+  }
 }
