@@ -1,7 +1,71 @@
 <h3>Testing a service that makes HTTP calls</h3>
 
 <p>
-  Testing HTTP services is one area that I find the Angular docs particularly lacking,
-  so hopefully this is helpful. In this section, we'll look at how we can test that
-  our service makes the correct requests, as well as mocking HTTP responses. 
+  Angular provides us with a drop-in replacement for the HTTP service, which allows
+  us to spy on requests and send mock responses, much like <code>$httpBackend</code> in
+  AngularJS. And, just like <code>$httpBackend</code>, the new 
+  <code>HttpTestingController</code> makes all its responses synchronously, greatly 
+  simplifying testing.
 </p>
+
+<p>
+  <code>HttpTestingController</code> lives in <code>HttpClientTestingModule</code>.
+  You can import both from <code>@angular/common/http/testing</code>. You need to
+  provide the module to the TestBed, and then you can grab a reference to the 
+  controller.
+</p>
+<pre><code>import &#123; TestBed } from '@angular/core/testing';
+import &#123; HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+
+import &#123; MyServiceThatIWantToTest } from './my.service';
+
+describe('MyServiceThatIWantToTest', () => &#123;
+  let http: HttpTestingController;
+
+  beforeEach(() => &#123;
+    TestBed.configureTestingModule(&#123;
+      imports:[ HttpClientTestingModule ]
+    });
+
+    http = TestBed.get(HttpTestingController);
+  });
+
+});</code></pre>
+
+<p>
+  Note we're using <code>imports</code> here, not <code>providers</code>. What's the 
+  difference? Use <code>providers</code> to provide individual services. You can use
+  <code>imports</code> to provide entire modules.
+</p>
+
+<p>And now we're ready to test stuff!</p>
+
+<h3>Testing a request was made</h3>
+
+<p>
+  We can test that a request to a specific URL was made using 
+  <code>HttpTestingController.expectOne(url)</code>. Try it out with the 
+  <code>makeRequest</code> method of the <code>HttpService</code> in 
+  <code>http.service.spec.ts</code>. (Yes, HttpService is a pretty rubbish name,
+  I really should have called it something else, but naming things is hard).
+  Don't forget you need to subscribe to the response from 
+  <code>makeRequest</code>.
+</p>
+
+<pre><code>it('should make a request', () => &#123;
+  service.makeRequest().subscribe();
+  http.expectOne('/foo');
+});</code></pre>
+
+<p>
+  We can also check other details of the request, using the <code>request</code>
+  property of the object returned by <code>expectOne</code>.
+</p>
+
+- check it makes a request
+- check it uses the right method & parameters
+- check it sends the right data
+- check it doesn't make a request
+- check it doesn't make any other requests
+- given a valid response, make sure the service does the right thing
+- given an error response, make sure the service does the right thing

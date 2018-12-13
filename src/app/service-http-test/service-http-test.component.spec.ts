@@ -8,7 +8,7 @@ describe('ServiceHttpTestComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ServiceHttpTestComponent ]
+      declarations: [ ServiceHttpTestComponent ],
     })
     .compileComponents();
   }));
