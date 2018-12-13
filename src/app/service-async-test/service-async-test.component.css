@@ -1,0 +1,23 @@
+.sync {
+  background: var(--black);
+  color: white;
+}
+.async {
+  background: hsl(0, 50%, 60%);
+  color: white;
+}
+
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 20px solid white;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

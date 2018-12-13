@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { DependencyService, UnannotatedService, AnnoyingInitiationService, HelpService } from './dependency.service';
 
-fdescribe('DependencyService', () => {
+describe('DependencyService', () => {
   let service;
 
   beforeEach(() => {

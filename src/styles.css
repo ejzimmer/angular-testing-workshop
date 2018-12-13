@@ -6,5 +6,5 @@ body {
     Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: hsl(var(--blue-hue), 50%, 60%);
+  background: hsl(var(--blue-hue), 60%, 80%);
 }

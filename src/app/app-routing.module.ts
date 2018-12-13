@@ -4,10 +4,12 @@ import { ContentsComponent } from './contents/contents.component';
 import { ServiceTestComponent } from './service-test/service-test.component';
 import { ServiceDependencyTestComponent } from './service-dependency-test/service-dependency-test.component';
 import { ServiceHttpTestComponent } from './service-http-test/service-http-test.component';
+import { ServiceAsyncTestComponent } from './service-async-test/service-async-test.component';
 
 const routes: Routes = [
   { path: 'service-test', component: ServiceTestComponent },
   { path: 'service-dependency-test', component: ServiceDependencyTestComponent },
+  { path: 'service-async-test', component: ServiceAsyncTestComponent },
   { path: 'service-http-test', component: ServiceHttpTestComponent },
   { path: '', component: ContentsComponent }
 ];
