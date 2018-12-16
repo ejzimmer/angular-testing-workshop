@@ -17,7 +17,7 @@ export class ResultsComponent implements OnInit {
   }
 
   getStatus(test) {
-    const result = this.results && this.results.find(result => result.fullName === `${this.suite} ${test}`);
+    const result = this.results && this.results.find(result => result.fullName.startsWith(this.suite) && result.fullName.endsWith(test));
     if (!result) {
       return;
     }

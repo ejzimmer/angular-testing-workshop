@@ -32,7 +32,7 @@ export class ContentsComponent implements OnInit {
     },
     {
       title: 'A service with dependencies',
-      suite: 'ServiceDependencyTestComponent',
+      suite: 'DependencyService',
       link: 'service-dependency-test',
       tests: [
         'should be created',

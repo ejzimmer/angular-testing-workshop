@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { HttpService } from './http.service';
 
-fdescribe('HttpService', () => {
+describe('HttpService', () => {
   let http: HttpTestingController;
   let service: HttpService;
 

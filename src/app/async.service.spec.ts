@@ -2,8 +2,6 @@ import { TestBed, async, fakeAsync, tick, flushMicrotasks, flush } from '@angula
 
 import { AsyncService } from './async.service';
 
-// do discardPeriodicTasks in the Observables one
-
 describe('AsyncService', () => {
   let service;
 
@@ -18,6 +16,7 @@ describe('AsyncService', () => {
 
   it('should send back an echo', () => {
     // service.echo('coo-ee', 500)...
+    expect(true).toBe(true);
   });
 
   /*
