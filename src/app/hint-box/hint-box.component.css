@@ -1,0 +1,14 @@
+button {
+  background-color: hsl(318, 74%, 40%);
+  color: #eee;
+  padding: 12px 18px;
+}
+
+.hidden {
+  opacity: 0;
+  transform: scale(0) rotate(2turn); 
+}
+
+.answer {
+  transition: opacity .6s, transform .4s;
+}

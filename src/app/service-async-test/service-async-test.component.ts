@@ -12,6 +12,7 @@ export class ServiceAsyncTestComponent implements OnInit {
   response: Promise<string>;
   spinning: boolean;
   spinnerDelay: number;
+  responded = false;
 
   constructor(private asyncService: AsyncService) { }
 
@@ -19,7 +20,11 @@ export class ServiceAsyncTestComponent implements OnInit {
   }
 
   async doEcho() {
+    this.responded = false;
     this.response = this.asyncService.echo(this.words, this.delay);
+    this.response.then(() => {
+      this.responded = true;
+    });
   }
 
   makeSpin() {

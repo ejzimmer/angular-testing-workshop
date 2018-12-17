@@ -59,7 +59,7 @@ export class ContentsComponent implements OnInit {
     { 
       title: 'A service that uses HTTP',
       suite: '',
-      link: 'service-http-test',
+      link: '',
       tests: [
 
       ]

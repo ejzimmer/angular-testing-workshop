@@ -1,10 +1,53 @@
 .sync {
-  background: var(--black);
-  color: white;
+  background: hsl(160, 50%, 60%);
+  color: var(--black);
 }
 .async {
   background: hsl(0, 50%, 60%);
   color: white;
+}
+
+.words, .delay, .response {
+  background: hsla(0, 0%, 90%, .2);
+  border: none;
+  border-bottom: 1px solid var(--black);
+  padding: 0 12px;
+  padding-top: 6px;
+  font-size: 1rem;
+  margin-right: 1em;
+}
+.words:focus, .delay:focus {
+  outline: none;
+}
+.delay {
+  width: 6ch;
+  text-align: center;
+}
+
+button.echo {
+  display: block;
+  font-weight: bold;
+  color: #eee;
+  background: repeating-radial-gradient(circle, blue, black 20%);  height: 36px;
+}
+
+.word, .response {
+  width: 10ch; 
+}
+.response {
+  color: transparent;
+  transition: color 2s;
+  min-height: 24px;
+  border: 1px solid var(--black);
+  margin: 6px 0;
+}
+.response.responded {
+  color: currentColor;
+}
+
+.spinner-box {
+  min-height: 120px;
+  display: flex;
 }
 
 .spinner {
@@ -14,6 +57,13 @@
   border-radius: 50%;
   border-top-color: transparent;
   animation: spin 2s linear infinite;
+  margin: auto;
+} 
+
+button {
+  background-color: hsl(106, 74%, 40%);
+  padding: 6px 12px;
+  color: white;
 }
 
 @keyframes spin {

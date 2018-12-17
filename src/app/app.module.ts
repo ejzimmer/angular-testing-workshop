@@ -12,6 +12,7 @@ import { ScoreComponent } from './score/score.component';
 import { ServiceDependencyTestComponent } from './service-dependency-test/service-dependency-test.component';
 import { ServiceHttpTestComponent } from './service-http-test/service-http-test.component';
 import { ServiceAsyncTestComponent } from './service-async-test/service-async-test.component';
+import { HintBoxComponent } from './hint-box/hint-box.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { ServiceAsyncTestComponent } from './service-async-test/service-async-te
     ServiceDependencyTestComponent,
     ServiceHttpTestComponent,
     ServiceAsyncTestComponent,
+    HintBoxComponent,
   ],
   imports: [
     BrowserModule,

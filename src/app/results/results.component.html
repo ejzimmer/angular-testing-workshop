@@ -1,2 +1,9 @@
-<div *ngFor="let test of tests" class="test-result {{ getStatus(test) }}">
+<div class="test-results">
+  <div>Success</div>
+  <div *ngFor="let test of tests" class="light" [ngClass]="{ passing: getResult(test) === 'passing' }"></div>
+</div>
+
+<div class="test-results">
+  <div>Failure</div>  
+  <div *ngFor="let test of tests" class="light" [ngClass]="{ failing: getResult(test) === 'failing' }"></div>
 </div>

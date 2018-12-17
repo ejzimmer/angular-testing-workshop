@@ -1,0 +1,6 @@
+<button (click)="showAnswer = !showAnswer">
+  <ng-content select="[title]"></ng-content>
+</button>
+<div class="answer" [ngClass]="{ hidden: !showAnswer }">
+  <ng-content select="[answer]"></ng-content>
+</div>
