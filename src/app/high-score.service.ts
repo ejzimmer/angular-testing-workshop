@@ -20,6 +20,6 @@ export class HighScoreService {
   }
 
   getSomeStuff() {
-    return 'foo';
+    return 'someStuff';
   }
 }

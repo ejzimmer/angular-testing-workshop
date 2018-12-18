@@ -1,22 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-
-import { DependencyService, UnannotatedService, AnnoyingInitiationService, HelpService } from './dependency.service';
-
-describe('DependencyService', () => {
+ 
+import { DependencyService } from './dependency.service';
+import { UnannotatedService } from './unannotated.service';
+import { AnnoyingInitiationService } from './annoying-initiation.service';
+import { EmergencyService } from './emergency.service';
+ 
+fdescribe('DependencyService', () => {
   let service;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ 
-        UnannotatedService,
-        {
-          provide: AnnoyingInitiationService,
-          useValue: {
-            getCombinedEmoji: () => '🇲🇶'
-          }
-        },
-        HelpService
-      ]
+      providers: []
     });
 
     service = TestBed.get(DependencyService);
@@ -34,17 +28,16 @@ describe('DependencyService', () => {
     expect(service.stubbedValue).toBe('🇲🇶')
   });
 
-  // This is a terrible test. I just needed something you could stub.
   it('should get an emoji from the list', () => {
-    const annoyingService = TestBed.get(AnnoyingInitiationService);
-    annoyingService.getEmoji = () => '🦱';
-    expect(service.getRandomEmoji()).toBe('🦱');
+    expect(service.getRandomEmoji()).toBe('👩‍🔬');
+  });
+
+  it('should get the special weekend emoji on weekends', () => {
+    expect(service.getRandomEmoji()).toBe('🎉');
   });
 
   it('should call for help', () => {
-    const helpService = TestBed.get(HelpService);
-    spyOn(helpService, 'callForHelp');
-    service.onEmergency();
-    expect(helpService.callForHelp).toHaveBeenCalled();
-  });
+    service.callForHelp();
+    //expect(emergency.help).toHaveBeenCalled(); uncomment this line!
+  })
 });

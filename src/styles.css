@@ -51,6 +51,10 @@ code, pre {
   overflow-x: auto;
 }
 
+code.error {
+  color: hsl(0, 60%, 75%);
+}
+
 button {
   border: none;
   box-shadow: 1px 1px 2px hsla(0, 0%, 50%, .6);

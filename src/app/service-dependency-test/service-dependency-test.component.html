@@ -6,9 +6,9 @@
     might be a little more effort required to get your tests up and running. Unfortunately,
     you don't really run into these efforts until you have a reasonably complicated project.
     Our example project isn't really that complicated, so we're going to use a horribly
-    contrived example. One thing - these tests all require work in the setup stage of the 
+    contrived example. One thing - these tests mostly require work in the setup stage of the 
     test suite. This means they're probably all going to fail with an error until you've 
-    fixed all of them. Try not to freak out.
+    fixed a few things. Try not to freak out.
   </p>
 </section>
 
@@ -21,11 +21,12 @@
     <li>
       your service and all its dependencies (and all <i>their</i>
       dependencies) are annotated with 
-  <pre><code>
-      @Injectable(&#123;
-        providedIn: 'root'
-      })    
-  </code></pre>
+<pre><code>
+  @Injectable(&#123;
+    providedIn: 'root'
+  })
+
+</code></pre>
     </li>
   </ul>
   <p>
@@ -63,114 +64,233 @@
       }));
   </code></pre>
 
-  <div>
-    The super contrived example is in <code>dependency.service.spec.ts</code>. You'll
-    need to provide it with a dependency of <code>UnannotatedService</code>. (You can
-    find the code for UnannotatedService in <code>dependency.service.ts</code>,
-    because it's my workshop and I'll put a bunch of services in one file if I want to.)
-  </div>
-  <pre><code>
-    beforeEach(() => &#123;
-      TestBed.configureTestingModule(&#123;
-        providers: [ UnannotatedService ]
-      });
-      service = TestBed.get(DependencyService);
-    });
-  </code></pre>
-  <div>(or add the providedIn annotation to UnannotatedService)</div>  
+  <p>
+    The example we're going to look at today is in <code>dependency.service.spec.ts</code>.
+    It depends on <code>UnannotatedService</code> and <code>AnnoyingInitiationService</code>.
+    Currently all the tests are failing with an error something like
+    <code class="error">NullInjectorError: No provider for UnannotatedService!</code>
+    You'll need to sort that out.
+  </p>
+
+  <app-hint-box>
+    <span title>Oh yes, and how do I do that?</span>
+    <div answer>
+      <p>
+        You've got a couple of options. You can go old school, and provide the dependency to the TestBed.
+      </p>
+      <pre><code>
+        beforeEach(() => &#123;
+          TestBed.configureTestingModule(&#123;
+            providers: [ UnannotatedService ]
+          });
+      
+          service = TestBed.get(DependencyService);
+        });        
+      </code></pre>
+
+      <p>Or you can just add the relevant annotation to the UnannotatedService class.</p>
+
+      <pre><code>
+          @Injectable(&#123;
+            providedIn: 'root'
+          })          
+      </code></pre>
+    </div>
+  </app-hint-box>
+
+  <p>Of course, once you do that, you just get another error</p>
+
+  <code class="error">NullInjectorError: No provider for AnnoyingInitiationService</code>
+
+  <p>
+    And providing AnnoyingInitiationService just results in yet another error.
+  </p>
+
+  <code class="error">Can't resolve all parameters for AnnoyingInitiationService: (?)</code>
+
+  <p>What is a dev to do?</p>
 </section>
 
 <section>
   <h3>Providing dependencies - using stubs</h3>
 
   <p>
-    And sometimes even this isn't enough. Sometimes you have deep dependency chains that
-    are a complete pain to manage. Or you've got dependencies that make HTTP calls on
-    initialisation and you just don't want to deal with that crap. In these cases, you can
-    stub your dependencies.
+    Often, you'll want to provide mock values to be returned by your service's dependencies. And 
+    Angular provides a couple of easy ways to do that. The least subtle is to just stub 
+    out the entire dependency and provide your own value. This can be helpful if the dependency has 
+    some complicated initialisation that you don't want to deal with, or it's got a bunch of methods and 
+    you really only care about one or two, or the dependency itself has complicated dependencies that you 
+    don't want to deal with.
   </p>
 
-  <div>
-    The easiest way to do this is providing a service using <code>useValue</code>
-  </div>
+  <p>
+    In our case, <code>AnnoyingInitiationService</code> depends on Angular's HttpClient. Angular actually 
+    provides a really nice test mock for HttpClient, which we'll look at in a later section, but, for now, 
+    we just don't want to deal with it at all. We can do that by providing the TestBed with a mock service instead.
+  </p>
+
   <pre><code>
-      beforeEach(() => TestBed.configureTestingModule(&#123;
-        providers: [ 
-          MyService, 
-          NiceDependency,
-          &#123;
-            provide: NastyDependency,
-            useValue: &#123;}
+    TestBed.configureTestingModule(&#123;
+      providers: [
+        &#123;
+          provide: NastyDependency,
+          useValue: &#123;
+            mockFunction: () => '🐲',
           }
-        ]
-      }));
+        }
+      ]
+    })
   </code></pre>
 
   <p>
-    Angular's dependency injection is basically a big key-value store. The key is the 
-    <i>type</i> of the service, and the value is the <i>instance</i> of that type that the 
-    application is using. Normally, Angular adds services to the injector by just 
-    instantiating a single instance of the type of each service. What we're doing here is 
-    basically hacking the injector and telling it to use our value (which is an empty 
-    object), instead of trying to create an instance of NastyDependency. 
+    You can pass any object you like as the <code>useValue</code> property, but make sure it implements any 
+    functions and initialises any properties you're going to use. (And yes, it's fine that we're passing in 
+    an object literal when the real service is a class, becauses classes in JavaScript are made up and don't 
+    really exist. Isn't that fun? 😆)
   </p>
-
-  <div>
-    Of course, if we just pass in an empty object like this, we're going to run into 
-    trouble if we try to call any of the functions in our dependency, because they're 
-    not there! So you'll need to add stubbed versions of any functions you want to call.
-    You can also initialise any properties that you need.
-  </div>
-  <pre><code>
-      beforeEach(() => TestBed.configureTestingModule(&#123;
-        providers: [ 
-          MyService, 
-          NiceDependency,
-          &#123;
-            provide: NastyDependency,
-            useValue: &#123;
-              startDate: new Date(),
-              calculateSomething: () => this.startDate,
-              calculateSomethingAsync: () => Promise.resolve('🦖')
-            }
-          }
-        ]
-      }));
-  </code></pre>
 
   <p>
-    In our example (<code>dependency.service.spec.ts</code>), we have a dependency that 
-    makes an HTTP call in its constructor - the aptly named 
-    <code>AnnoyingInitiationService</code>. We don't really want to deal with stubbing 
-    HTTP at this point, so let's just stub out the whole AnnoyingInitiationService.
+    So, how does this work? Angular's dependency injection is basically a big key-value store. The key is the 
+    <i>type</i> of the service, and the value is the <i>instance</i> of that type that the application is using. 
+    Normally, Angular adds services to the injector by instantiating a single instance of the type of 
+    each service. What we're doing here is basically hacking the injector and telling it to use our value instead.
   </p>
+
+  <p>So, armed with this knowledge, go forth and destroy that error in the test!</p>
 
   <app-hint-box>
-    <span title>Yes? And how do I do that?</span>
+    <span title>Just run that by me again, with a little more detail and an exact solution?</span>
     <div answer>
       <pre><code>
         TestBed.configureTestingModule(&#123;
           providers: [ 
-            UnannotatedService,
+            UnannotatedService, 
             &#123;
               provide: AnnoyingInitiationService,
               useValue: &#123;
-                getCombinedEmoji: () => '🇲🇶'
+                getCombinedEmoji: () => '🇲🇶',
+                getEmoji: () => '👩‍🔬'
               }
             }
           ]
         });
-      </code></pre>    
+      </code></pre>
     </div>
   </app-hint-box>
-  <div>
-    Don't forget to ensure the emoji you return in the stub matches the emoji you're
-    checking for in the test.
-  </div>
+
+  <p>Fantastic, that should leave us with just a couple of failing tests!</p>
 </section>
 
 <section>
-  <h3>Providing dependencies - using AngularJS services with ng-upgrade</h3>
+  <h3>Stubbing just a bit</h3>
+
+  <p>
+    Sometimes, you just want to stub out a single function in a dependency. Or, you want your
+    stubs to return different values in different tests. We can deal with this situation by
+    grabbing a reference to our dependency from inside the test, and doing whatever we need 
+    to there. 
+  </p>
+
+  <p>
+    You can grab a reference to a dependency from inside the test just the same as you got 
+    the reference to the service in the first place.
+  </p>
+  <pre><code>const myDependency = TestBed.get(DependencyServiceClass)</code></pre>
+
+  <p>
+    Then you can stub functions and set properties to your heart's content!
+  </p>
+  <pre><code>
+    myDependency.dance = () => '🕺💃🏾';
+    myDependency.disc = '💿';
+  </code></pre>
+
+  <p>So let's fix that next test!</p>
+
+  <app-hint-box>
+    <span title>How, exactly?</span>
+    <div answer>
+      <pre><code>
+        it('should get the special weekend emoji on weekends', () => &#123;
+          const annoyingService = TestBed.get(AnnoyingInitiationService);
+          annoyingService.isWeekend = true;
+          expect(service.getRandomEmoji()).toBe('🎉');
+        });        
+      </code></pre>
+    </div>
+  </app-hint-box>
+
+  <p>Just one more to go...</p>
+</section>
+
+<section>
+  <h3>Spies and secret agents</h3>
+
+  <p>
+    You can use these techniques to set up spies too. If you're spying on your 
+    function a lot, you can setup the spy when you set up the TestBed...
+  </p>
+
+  <pre><code>
+    beforeEach(() => TestBed.configureTestingModule(&#123;
+      providers: [ 
+        &#123;
+          provide: ServiceWithJustOneSpy,
+          useValue: &#123;
+            getHappyEmoji: jasmine.createSpy('getHappyEmoji')
+          }
+        },
+        &#123;
+          provide: ServiceThatNeedsHeapsOfSpies,
+          useValue: jasmine.createSpyObject('EmojiService', ['getHappyEmoji', 'getSadEmoji'])
+        }
+      ]
+    }));
+  </code></pre>
+
+  <p>Or inside a test...</p>
+  <pre><code>
+    const dependency = TestBed.get(MyDependency);
+    spyOn(dependency, 'getHappyEmoji');
+    expect(dependency.getHappyEmoji).toHaveBeenCalled();
+  </code></pre>
+
+  <p>
+    The first string passed into <code>createSpy</code> and <code>createSpyObject</code> 
+    is a name for the spy. Jasmine will use this name when reporting errors in your test, which is handy.
+  </p>
+
+  <p>
+    By default, the spies will return <code>undefined</code>. If you need them to return something else, you
+    can totally do that.
+  </p>
+  <pre><code>
+    dependency.getHappyEmoji = jasmine.createSpy('getHappyEmoji').and.returnValue('😊');
+    dependency.getSomeEmoji = jasmine.createSpy('getHappyEmoji')
+                                  .and.callFake((upsideDown) => upsideDown ? '🙃' : '😊');
+  </code></pre>
+
+  <p>
+    Ok, go fix that last test!
+  </p>
+
+  <app-hint-box>
+    <span title>...</span>
+    <div answer>
+      <pre><code>
+        it('should call for help', () => &#123;
+          const emergency = TestBed.get(EmergencyService);
+          spyOn(emergency, 'help');
+          service.callForHelp();
+          expect(emergency.help).toHaveBeenCalled();
+        })        
+      </code></pre>
+    </div>
+  </app-hint-box>
+</section>
+
+<section>
+  <h3>Special considerations for AngularJS</h3>
 
   <p>
     I'm not going to lie - testing services that depend on AngularJS services in an 
@@ -203,148 +323,17 @@
 
   <p>
     If your AngularJS dependency has dependencies on other AngularJS services, you're
-    going to run into the same hassles as with Angular services above. In those cases 
-    you can define a stubbed version of the AngularJS service using 
-    <code>useValue</code> just like we did above.
-  </p>
-</section>
-
-<section>
-  <h3>Returning custom values & spying</h3>
-
-  <div>
-    If you need one of your dependency's functions to return a specific value for your 
-    test, you can either set that up when you create the stub (like above), or you can 
-    do it within the test. To do it inside your test, you can grab a reference to the
-    service in your class and stub out the function. You can also set properties on your 
-    service in the same way.
-  </div>
-  <pre><code>
-      const emojiService = TestBed.get(EmojiService);
-      emojiService.currentMood = '🌋';
-      emojiService.getRandomEmoji = () => '🤘🏻';
-  </code></pre>
-
-  <p>
-    This time we want to implement the terrible test that checks that 
-    <code>getRandomEmoji</code> returns the correct value. Yes, it's not really testing 
-    anything, we're just practising stubbing. You want to implement the test called 
-    'should get an emoji from the list'.
-  </p>
-
-  <app-hint-box>
-    <span title>whatever</span>
-    <div answer>
-      <pre><code>
-        it('should get an emoji from the list', () => &#123;
-          const annoyingService = TestBed.get(AnnoyingInitiationService);
-          annoyingService.getEmoji = () => '🦱';
-          expect(service.getRandomEmoji()).toBe('🦱');
-        });  
-      </code></pre>    
-    </div>
-  </app-hint-box>
-
-  <p>
-    If you want to spy on a function, it works pretty much the same. If you're going to
-    spy on it a lot, you can set up the spy when you initialise everything.
-  </p>
-
-  <div>
-    To just spy on a single function
-  </div>
-  <pre><code>
-      beforeEach(() => TestBed.configureTestingModule(&#123;
-        providers: [ 
-          MyService, 
-          &#123;
-            provide: EmojiService,
-            useValue: &#123;
-              getHappyEmoji: jasmine.createSpy('getHappyEmoji')
-            }
-          }
-        ]
-      }));
-  </code></pre>
-  <div>
-    Don't forget to give your spy a name, so debugging is easier later.
-  </div>
-
-  <div>
-    To spy on all the functions in a service
-  </div>
-  <pre><code>
-      beforeEach(() => TestBed.configureTestingModule(&#123;
-        providers: [ 
-          MyService, 
-          &#123;
-            provide: EmojiService,
-            useValue: jasmine.createSpyObject('EmojiService', ['getHappyEmoji', 'getSadEmoji'])
-          }
-        ]
-      }));
-  </code></pre>
-
-  <p>
-    Don't forget that by default, your spy will return undefined. If you need it to return 
-    a value, you can tell it to return a mock value, or call a mock function.
-  </p>
-
-  <div>Mock value:</div>
-  <pre><code>getHappyEmoji: jasmine.createSpy('getHappyEmoji').and.returnValue('😊')</code></pre>
-
-  <div>Mock function:</div>
-  <pre><code>
-  getHappyEmoji: jasmine.createSpy('getHappyEmoji')
-                    .and.callFake((upsideDown) => upsideDown ? '🙃' : '😊')</code></pre>
-
-  <div>
-    If you just need to spy on something within a test, you can do that, similar to 
-    creating a stubbed function above.
-  </div>
-  <pre><code>
-      const emojiService = TestBed.get(EmojiService);
-      spyOn(emojiService, 'getRandomEmoji').and.returnValue('🤹🏿‍♀️');
-  </code></pre>
-</section>
-
-<section>
-  <p>
-    Let's just do one example for all of these. You're a smart cookie, I'm sure you get 
-    the idea.
+    going to need to provide them too. Or, you can provide a stubbed version of the 
+    AngularJS dependency, using <code>useValue</code>, just like above.
   </p>
 
   <p>
-    Last one for this section - we need to implement the call for help test.
-    Don't forget to make sure the HelpService is being included in the TestBed somehow
-    (either in the providers array, or via annotation).
+    You also need to remember that the keys are strings when you're using <code>TestBed.get()</code>.
+    To get access to an AngularJS service, use 
   </p>
-  <app-hint-box>
-    <span title>Show me</span>
-    <div answer>
-      <pre><code>
-        it('should call for help', () => &#123;
-          const helpService = TestBed.get(HelpService);
-          spyOn(helpService, 'callForHelp');
-          service.onEmergency();
-          expect(helpService.callForHelp).toHaveBeenCalled();
-        });  
-      </code></pre>    
-    </div>
-  </app-hint-box>
-</section>
-
-<section>
-  <h3>Getting access to AngularJS services</h3>
-
-  <div>
-    Remember how AngularJS uses strings instead of types in its dependency injection?
-    That affects how you get stuff out of the TestBed - instead of specifying the type 
-    you want, you need to pass in the string you used when you provided the dependency.
-    Other than that, it works exactly the same.
-  </div>
   <pre><code>
       const emojiService = TestBed.get('OldSchoolEmojiService');
       spyOn(emojiService, 'getRandomEmoji').and.returnValue(':-)');
   </code></pre>
+  <p>Note that we're passing in the string 'OldSchoolEmojiService', not the class.</p>
 </section>
