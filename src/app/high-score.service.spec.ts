@@ -19,7 +19,7 @@ describe('HighScoreService', () => {
   });
 
   it('should fetch the score from local storage', () => {
-    
+
   });
 
   it('should set the score if the current score is higher than the previous higher score', () => {

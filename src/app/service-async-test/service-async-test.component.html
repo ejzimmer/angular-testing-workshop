@@ -252,7 +252,7 @@
   </app-hint-box>
 
   <app-hint-box>
-    <span title>A solution using <code>async/await</code></span>
+    <span title>A (bonus) solution using <code>async/await</code></span>
     <div answer>
       <pre><code>
         it('should send back an echo', async () => &#123;
@@ -270,7 +270,7 @@
 </section>
 
 <section>
-  <h3>The fake async zone</h3>
+  <h3>Testing a spinner service</h3>
 
   <div>
     The rest of the functionality in the AsyncService is related to implementing a service for a spinner.
@@ -294,7 +294,7 @@
     </li>
   </ol>
 
-  <div>You can try it out if you like</div>
+  <p>You can try it out if you like</p>
   <div>
     Add task with <input type="number" [(ngModel)]="spinnerDelay" name="spinnerDelay" class="delay" /> second delay
     <button type="button" (click)="makeSpin()">Go</button>
@@ -308,6 +308,10 @@
     I'd love to hear it. In the meantime though, you get to test my implementation! But first, let's 
     have a look at the <code>fakeAsync</code> Zone and what it can do for us.
   </p>
+</section>
+
+<section>
+  <h3>The fakeAsync Zone</h3>
 
   <p>
     The <code>fakeAsync</code> zone essentially makes everything synchronous. When you call
@@ -320,7 +324,7 @@
   <p>
     The simplest way to get things off the queue is to call <code>flush()</code>. <code>flush()</code>
     will run all the callbacks in the queue (in the order they would have run in the real world), and 
-    returns the number of milliseconds that would have elapsed, if time were passing normally. This is 
+    return the number of milliseconds that would have elapsed, if time were passing normally. This is 
     handy for us - we can use it to check if our spinner has spun for the minimum time!
   </p>
 
@@ -329,9 +333,11 @@
     timer callbacks sitting in its queue when it ends, it will throw an error and your test will fail.
   </p>
 
-  <h4>It should spin for a second, if the given promise takes less than a second to resolve</h4>
+  <p>Your mission is to complete the remaining tests in <code>async.service.spec.ts</code>. Let's do this thing.</p>
+</section>
 
-  <p>Let's do this thing.</p>
+<section>
+  <h4>It should spin for a second, if the given promise takes less than a second to resolve</h4>
 
   <app-hint-box style="margin-bottom: 12px;">
     <span title>I don't really know where to start, can I have a hint?</span>
@@ -359,9 +365,28 @@
     </div>
   </app-hint-box>
 
-  <app-hint-box></app-hint-box>
-  <button>One possible solution</button>
-  <pre><code>it('should spin for a second, if the given promise takes less than a second to resolve', fakeAsync(() => &#123;
+  <app-hint-box>
+    <span title>How about more of a hint?</span>
+    <div answer>
+      <p>So, the things we need to do are:</p>
+      <ol>
+        <li>Start our spinner spinning, by passing in a Promise</li>
+        <li>Resolve the Promise that we passed in</li>
+        <li>
+          Run the setTimeout callback that adds the one second delay to our spinner <i>and</i>
+          any <code>then</code> callbacks, including the one in our test
+        </li>
+        <li>Check our spinner has stopped</li>
+        <li>Check that it took at least a second for all this to happen</li>
+      </ol>          
+    </div>
+  </app-hint-box>
+
+  <app-hint-box>
+    <span title>One possible solution</span>
+    <div answer>
+      <pre><code>
+      it('should spin for a second, if the given promise takes less than a second to resolve', fakeAsync(() => &#123;
         let isSpinning = true;
         service.spin(promise).then(() => &#123;
           isSpinning = false;
@@ -370,34 +395,96 @@
         const time = flush();
         expect(isSpinning).toBe(false);
         expect(time).toBeGreaterThanOrEqual(1000);
-      }));</code></pre>
-
-  <ol>
-    <li>Start our spinner spinning, by passing in a Promise</li>
-    <li>Resolve the Promise that we passed in</li>
-    <li>
-      Run the setTimeout callback that adds the one second delay to our spinner <i>and</i>
-      any <code>then</code> callbacks, including the one in our test
-    </li>
-    <li>Check our spinner has stopped</li>
-    <li>Check that it took at least a second for all this to happen</li>
-  </ol>
+      }));
+      </code></pre>
+    </div>
+  </app-hint-box>
 
   <p>Phew. That was fun, wasn't it? Ok, let's step it up a notch</p>
+</section>
 
+<section>
+  <h4>It should spin for a second, if the given promise takes less than a second to resolve</h4>
+  
+  <app-hint-box style="margin-bottom: 12px;">
+    <span title>I don't really know where to start, can I have a hint?</span>
+    <div answer>
+      <p>
+        We need a way to check whether our spinner Promise has resolved or not. Unfortunately, there's not 
+        really an easy way to check a Promise's state directly. Instead, we can check it indirectly, by 
+        doing something like
+      </p>
+      <pre><code>let isSpinning = true;
+      service.spin(promise).then(() => &#123;
+        isSpinning = false;
+      });</code></pre>
+      <div>
+        Then we can do whatever we need to do in our test and use
+      </div>
+      <pre><code>expect(isSpinning).toBe(true/false)</code></pre>
+      <p>
+        to check the state of our spinner. You'll probably want to reuse this snippet across multiple
+        tests, so it might be an idea to extract it into a function. Don't be tempted to put it in the 
+        <code>beforeEach</code> though - remember, it needs to run inside our <code>fakeAsync</code>
+        Zone. (Yes, you could wrap <code>beforeEach</code> in a <code>fakeAsync</code> Zone too, but it
+        would be in a different <code>fakeAsync</code> zone than the test, so it wouldn't work).
+      </p>          
+    </div>
+  </app-hint-box>
+  
+  <app-hint-box>
+    <span title>How about more of a hint?</span>
+    <div answer>
+      <p>So, the things we need to do are:</p>
+      <ol>
+        <li>Start our spinner spinning, by passing in a Promise</li>
+        <li>Resolve the Promise that we passed in</li>
+        <li>
+          Run the setTimeout callback that adds the one second delay to our spinner <i>and</i>
+          any <code>then</code> callbacks, including the one in our test
+        </li>
+        <li>Check our spinner has stopped</li>
+        <li>Check that it took at least a second for all this to happen</li>
+      </ol>          
+    </div>
+  </app-hint-box>
+  
+  <app-hint-box>
+    <span title>One possible solution</span>
+    <div answer>
+      <pre><code>
+      it('should spin for a second, if the given promise takes less than a second to resolve', fakeAsync(() => &#123;
+        let isSpinning = true;
+        service.spin(promise).then(() => &#123;
+          isSpinning = false;
+        });
+        resolve();
+        const time = flush();
+        expect(isSpinning).toBe(false);
+        expect(time).toBeGreaterThanOrEqual(1000);
+      }));
+      </code></pre>
+    </div>
+  </app-hint-box>
+  
+  <p>Phew. That was fun, wasn't it? Ok, let's step it up a notch</p>
+</section>
+  
+<section>
   <h4>It should spin until the given promise resolves, if the promise takes more than one second</h4>
+
   <p>
     <code>fakeAsync</code> has a couple of other weapons we can add to our arsenal. These next two work 
     like <code>flush()</code> but give us a little more fine-grained control.
   </p>
-
+  
   <p>
     <code>tick(millis)</code> manually advances time by the number of milliseconds given. First, it runs 
     any Promise callbacks that are waiting. Then it runs the callbacks for any timers that would have 
     expired in the given time. After each timer callback, it runs any new Promise callbacks that have been
     generated. 
   </p>
-
+  
   <p>
     <code>flushMicrotasks()</code> runs any Promise callbacks that are waiting. Remember how I said before 
     that within the <code>fakeAsync</code> Zone, all the async callbacks get added to a queue? There's 
@@ -406,97 +493,142 @@
     allows Angular to emulate that behaviour. <code>tick</code> and <code>flush</code> will always empty 
     the Promise callback queue (the microtask queue) before they touch the other queue.
   </p>
-
+  
   <p>Ok, so how about our test?</p>
-
-  <pre><code>it('should spin until the given promise resolves, if the promise takes more than one second', fakeAsync(() => &#123;
-    let isSpinning = true;
-    service.spin(promise).then(() => &#123;
-      isSpinning = false;
-    });
-    tick(1000);
-    expect(isSpinning).toBe(true);
-    resolve();
-    flushMicrotasks();
-    expect(isSpinning).toBe(false);
-  }));</code></pre>
-
-  <ol>
-    <li>Start our spinner spinning, just like before</li>
-    <li>Advance time by one second, causing our timer to expire</li>
-    <li>Check our spinner is still spinning</li>
-    <li>Resolve the Promise we passed in</li>
-    <li>Run all the Promise callbacks, including the one in the test</li>
-    <li>Check our spinner has stopped</li>
-  </ol>
-
+  
+  <app-hint-box>
+    <span title>What things should I do?</span>
+    <div answer>
+      <ol>
+        <li>Start our spinner spinning, just like before</li>
+        <li>Advance time by one second, causing our timer to expire</li>
+        <li>Check our spinner is still spinning</li>
+        <li>Resolve the Promise we passed in</li>
+        <li>Run all the Promise callbacks, including the one in the test</li>
+        <li>Check our spinner has stopped</li>
+      </ol>        
+    </div>
+  </app-hint-box>
+  
+  <app-hint-box>
+    <span title>One way of doing it</span>
+    <div answer>
+      <pre><code>
+        it('should spin until the given promise resolves, if the promise takes more than one second', fakeAsync(() => &#123;
+          let isSpinning = true;
+          service.spin(promise).then(() => &#123;
+            isSpinning = false;
+          });
+          tick(1000);
+          expect(isSpinning).toBe(true);
+          resolve();
+          flushMicrotasks();
+          expect(isSpinning).toBe(false);
+        }));
+      </code></pre>  
+    </div>
+  </app-hint-box>
+  
   <p>Onwards and upwards!</p>
-
+</section>
+  
+<section>
   <h4>It should stop spinning if the given promise is rejected and a second has passed</h4>
-
+  
   <p>
     Honestly, this test is the same as the last one, just with a <code>reject</code> instead of a 
     <code>resolve</code>. You got this.
   </p>
-
-  <pre><code>it('should stop spinning if the given promise is rejected and a second has passed', fakeAsync(() => &#123;
-    let isSpinning = true;
-    service.spin(promise).then(() => &#123;
-      isSpinning = false;
-    });
-    tick(1000);
-    reject();
-    flushMicrotasks();
-    expect(isSpinning).toBe(false);
-  }));</code></pre>
-
-  <h4>Multi-promise spinner</h4>
-
+  
+  <app-hint-box>
+    <span title>Show it to me anyway</span>
+    <div answer>
+      <pre><code>
+        it('should stop spinning if the given promise is rejected and a second has passed', fakeAsync(() => &#123;
+          let isSpinning = true;
+          service.spin(promise).then(() => &#123;
+            isSpinning = false;
+          });
+          tick(1000);
+          reject();
+          flushMicrotasks();
+          expect(isSpinning).toBe(false);
+        }));
+      </code></pre>  
+    </div>
+  </app-hint-box>
+</section>
+  
+<section>
+  <h3>Multi-promise spinner</h3>
+  
   <p>
     The tests for the spinner handling multiple Promises just use all the same stuff that we used above.
-    The one thing you'll need to think about is how the setup for <code>isSpinning</code> works, and make 
-    sure that you set it to <code>false</code> only after you've resolved <i>both</i> Promises. This is 
-    really just a matter of making sure you resolve the Promises in the right order.
+    The one thing you'll need to think about is how the setup for <code>isSpinning</code> works with two 
+    Promises. You'll need to make sure that you set it to <code>false</code> only after you've resolved 
+    <i>both</i> Promises. This is really just a matter of making sure you resolve the Promises in the right order.
   </p>
+</section>
 
-  <div>It should continue spinning until all given promises are resolved or rejected</div>
-  <pre><code>it('should continue spinning until all given promises are resolved or rejected', fakeAsync(() => &#123;
-    let isSpinning = true;
-    service.spin(promise);
+<section>
+  <h4>It should continue spinning until all given promises are resolved or rejected</h4>
 
-    service.spin(anotherPromise).then(() => &#123;
-      isSpinning = false;
-    });
+  <app-hint-box>
+    <span title>Show me</span>
+    <div answer>
+      <pre><code>
+        it('should continue spinning until all given promises are resolved or rejected', fakeAsync(() => &#123;
+          let isSpinning = true;
+          service.spin(promise);
+      
+          service.spin(anotherPromise).then(() => &#123;
+            isSpinning = false;
+          });
+      
+          tick(1000);
+          resolve();
+          flushMicrotasks();
+          expect(isSpinning).toBe(true);
+      
+          resolveAnotherPromise();
+          flushMicrotasks();
+          expect(isSpinning).toBe(false);
+      
+        }));
+      </code></pre>
+    </div>
+  </app-hint-box>
+</section>
 
-    tick(1000);
-    resolve();
-    flushMicrotasks();
-    expect(isSpinning).toBe(true);
+<section>
+  <h4>It should stop spinning after one second if all the promises have resolved or rejected in less than one second</h4>
 
-    resolveAnotherPromise();
-    flushMicrotasks();
-    expect(isSpinning).toBe(false);
-
-  }));</code></pre>
-
-  <div>It should stop spinning after one second if all the promises have resolved or rejected in less than one second</div>
-  <pre><code>it('should stop spinning after one second if all the promises have resolved or rejected in less than one second', fakeAsync(() => &#123;
-    let isSpinning = true;
-    service.spin(promise);
-
-    service.spin(anotherPromise).then(() => &#123;
-      isSpinning = false;
-    });
-
-    reject();
-    resolveAnotherPromise();
-    flushMicrotasks();
-    expect(isSpinning).toBe(true);
-
-    tick(1000);
-    expect(isSpinning).toBe(false);
-  }));</code></pre>
-
+  <app-hint-box>
+    <span title>And this one</span>    
+    <div answer>
+      <pre><code>
+        it('should stop spinning after one second if all the promises have resolved or rejected in less than one second', fakeAsync(() => &#123;
+          let isSpinning = true;
+          service.spin(promise);
+      
+          service.spin(anotherPromise).then(() => &#123;
+            isSpinning = false;
+          });
+      
+          reject();
+          resolveAnotherPromise();
+          flushMicrotasks();
+          expect(isSpinning).toBe(true);
+      
+          tick(1000);
+          expect(isSpinning).toBe(false);
+        }));
+      </code></pre>
+    </div>
+  </app-hint-box>
+</section>
+  
+<section>
   <p>
     Right. Well. That's testing async services done and dusted. I'd love to say it gets easier from here,
     but I'm afraid that might be a lie. Having a solid grasp of this stuff will definitely make it easier 

@@ -29,6 +29,9 @@ h3 {
   padding: 0;
   margin: .5em 0;
 }
+h4 {
+  font-style: italic;
+}
 
 section {
   padding: .5em 1em;
@@ -44,6 +47,8 @@ code, pre {
   color: #ccc;
   padding: .25em;
   line-height: 1.4em;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 button {
@@ -51,6 +56,7 @@ button {
   box-shadow: 1px 1px 2px hsla(0, 0%, 50%, .6);
   transition: box-shadow .2s;
   cursor: pointer;
+  font-size: 1rem;
 }
 button:active {
   box-shadow: none;

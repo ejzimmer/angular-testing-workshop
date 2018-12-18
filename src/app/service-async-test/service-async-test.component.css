@@ -29,6 +29,7 @@ button.echo {
   font-weight: bold;
   color: #eee;
   background: repeating-radial-gradient(circle, blue, black 20%);  height: 36px;
+  margin: 6px 0;
 }
 
 .word, .response {

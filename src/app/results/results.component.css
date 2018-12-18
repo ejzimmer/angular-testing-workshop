@@ -20,10 +20,10 @@
   box-shadow: var(--highlight), var(--background-shadow);
 }
 
-.test-result.passing {
+.light.passing {
   background-color: hsl(100, 50%, 50%);
 }
 
-.test-result.failing {
+.light.failing {
   background-color: hsl(0, 50%, 50%);
 }
