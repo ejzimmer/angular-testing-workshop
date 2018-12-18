@@ -1,4 +1,4 @@
-You'll need at least NPM 8.
+You'll need at least Node 8.
 
 1. `npm install` to install the dependencies
 2. `npm start` to start the Angular app and the Express server
