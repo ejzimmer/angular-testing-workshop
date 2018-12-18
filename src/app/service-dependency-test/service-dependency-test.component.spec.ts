@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ServiceDependencyTestComponent } from './service-dependency-test.component';
+import { HintBoxComponent } from '../hint-box/hint-box.component';
 
 describe('ServiceDependencyTestComponent', () => {
   let component: ServiceDependencyTestComponent;
@@ -8,7 +9,7 @@ describe('ServiceDependencyTestComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ServiceDependencyTestComponent ]
+      declarations: [ ServiceDependencyTestComponent, HintBoxComponent ]
     })
     .compileComponents();
   }));
