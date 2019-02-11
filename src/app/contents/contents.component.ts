@@ -58,10 +58,12 @@ export class ContentsComponent implements OnInit {
     },
     { 
       title: 'A service that uses HTTP',
-      suite: '',
-      link: '',
+      suite: 'HttpService',
+      link: 'service-http-test',
       tests: [
-
+        'should be created',
+        'should make a request',
+        'should send feedback'
       ]
     },
     { title: 'A service with Observables' },

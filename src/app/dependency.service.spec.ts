@@ -5,18 +5,35 @@ import { UnannotatedService } from './unannotated.service';
 import { AnnoyingInitiationService } from './annoying-initiation.service';
 import { EmergencyService } from './emergency.service';
  
-fdescribe('DependencyService', () => {
+describe('DependencyService', () => {
   let service;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: []
     });
+    // TestBed.configureTestingModule({
+    //   providers: [ 
+    //     // UnannotatedService,
+    //     {
+    //       provide: AnnoyingInitiationService,
+    //       useValue: {
+    //         getCombinedEmoji: () => '🇲🇶'
+    //       }
+    //     },
+    //     // {
+    //     //   provide: HelpService,
+    //     //   useValue: {
+    //     //     callForHelp: () => ''
+    //     //   }
+    //     // }
+    //   ]
+    // });
 
     service = TestBed.get(DependencyService);
   });
 
-  it('should be created', () => {
+  fit('should be created', () => {
     expect(service).toBeTruthy();
   });
 

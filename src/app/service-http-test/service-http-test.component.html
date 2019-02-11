@@ -62,8 +62,20 @@ describe('MyServiceThatIWantToTest', () => &#123;
   property of the object returned by <code>expectOne</code>.
 </p>
 
-- check it makes a request
-- check it uses the right method & parameters
+<p>type of object returned by expectOne</p>
+
+<p>Check that the sendFeedback function makes a POST request.</p>
+
+<pre><code>it('should send feedback', () => &123; 
+  service.sendFeedback('great!').subscribe();
+
+  const details = http.expectOne('/feedback').request;
+  expect(details.method).toBe('POST');
+});</code></pre>
+
+<p>And check that it sent the request in the correct format</p>
+
+<pre><code></code></pre>
 - check it sends the right data
 - check it doesn't make a request
 - check it doesn't make any other requests

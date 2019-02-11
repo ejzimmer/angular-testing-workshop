@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { HttpService } from './http.service';
 
-describe('HttpService', () => {
+fdescribe('HttpService', () => {
   let http: HttpTestingController;
   let service: HttpService;
 
@@ -27,10 +27,21 @@ describe('HttpService', () => {
   });
 
   it('should send feedback', () => {
-    service.sendFeedback('great!').subscribe();
+    const feedback = {
+      user: 'bender@planetexpress.com',
+      feedback: 'destroy all humans',
+      date: '1/1/3000'
+    }
+    service.sendFeedback(feedback).subscribe();
 
     const details = http.expectOne('/feedback').request;
     expect(details.method).toBe('POST');
+    expect(details.headers.get('Authorization')).toBe('totes legit');
+    expect(details.body).toEqual({
+      user: 'bender@planetexpress.com',
+      feedback: 'destroy all humans',
+      date: '3000-01-01'
+    });
   });
 
   afterEach(() => {
