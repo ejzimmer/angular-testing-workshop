@@ -1,6 +1,6 @@
 .test-results {
   --diameter: 15px;
-  --background-shadow: -1px -1px var(--shadow-colour);
+  --background-shadow: 1px 1px var(--shadow-colour);
   --highlight: inset 2px 3px 2px hsla(0, 0%, 100%, .6);
   display: flex;
 }

@@ -18,9 +18,9 @@ a {
   padding: 1em;
   margin: 1em 0;
   background-color: hsl(var(--blue-hue), 80%, 70%);
-  box-shadow: inset 4px 2px 2px hsl(var(--blue-hue), 80%, 30%), 
-              inset -4px -2px 2px hsl(var(--blue-hue), 80%, 90%),
-              -2px -1px 1px var(--shadow-colour);
+  box-shadow: inset -4px -2px 2px hsl(var(--blue-hue), 80%, 30%), 
+              inset 4px 2px 2px hsl(var(--blue-hue), 80%, 90%),
+              2px 1px 1px var(--shadow-colour);
   transition: box-shadow .2s, background-color .2s;
 }
 a:hover {
