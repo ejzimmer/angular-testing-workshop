@@ -1,26 +1,67 @@
-<h3>Testing a service that makes HTTP calls</h3>
+<h2>Testing a service that makes HTTP calls</h2>
 
-<p>
-  Angular provides us with a drop-in replacement for the HTTP service, which allows
-  us to spy on requests and send mock responses, much like <code>$httpBackend</code> in
-  AngularJS. And, just like <code>$httpBackend</code>, the new 
-  <code>HttpTestingController</code> makes all its responses synchronously, greatly 
-  simplifying testing.
-</p>
+<section>
+  <p>
+    Angular provides us with a drop-in replacement for the HTTP service, which allows
+    us to spy on requests and send mock responses, much like <code>$httpBackend</code> in
+    AngularJS. And, just like <code>$httpBackend</code>, the new 
+    <code>HttpTestingController</code> makes all its responses synchronously, greatly 
+    simplifying testing.
+  </p>
 
-<p>
-  <code>HttpTestingController</code> lives in <code>HttpClientTestingModule</code>.
-  You can import both from <code>@angular/common/http/testing</code>. You need to
-  provide the module to the TestBed, and then you can grab a reference to the 
-  controller.
-</p>
-<pre><code>import &#123; TestBed } from '@angular/core/testing';
-import &#123; HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+  <p>
+    <code>HttpTestingController</code> lives in <code>HttpClientTestingModule</code>.
+    You can import both from <code>@angular/common/http/testing</code>. You need to
+    provide the module to the TestBed, and then you can grab a reference to the 
+    controller.
+  </p>
+  <pre><code>import &#123; TestBed } from '@angular/core/testing';
+  import &#123; HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import &#123; MyServiceThatIWantToTest } from './my.service';
+  import &#123; MyServiceThatIWantToTest } from './my.service';
 
-describe('MyServiceThatIWantToTest', () => &#123;
+  describe('MyServiceThatIWantToTest', () => &#123;
+    let http: HttpTestingController;
+
+    beforeEach(() => &#123;
+      TestBed.configureTestingModule(&#123;
+        imports:[ HttpClientTestingModule ]
+      });
+
+      http = TestBed.get(HttpTestingController);
+    });
+
+  });</code></pre>
+
+  <p>
+    Note we're using <code>imports</code> here, not <code>providers</code>. What's the 
+    difference? Use <code>providers</code> to provide individual services. You can use
+    <code>imports</code> to provide entire modules.
+  </p>
+
+  <p>And now we're ready to test stuff!</p>
+</section>
+
+<h2>Testing a request was made</h2>
+
+<section>
+  <p>
+    We can test that a request to a specific URL was made using 
+    HttpTestingController's <code>expectOne(url)</code> method. You just pass it the URL you're 
+    expecting to be requested, some time after you've made the call. Try it out with the 
+    <code>makeRequest</code> method of the <code>HttpService</code> in 
+    <code>http.service.spec.ts</code>. (Yes, HttpService is a pretty rubbish name,
+    I really should have called it something else, but naming things is hard).
+    Don't forget you need to subscribe to the response from 
+    <code>makeRequest</code>.
+  </p>
+
+  <app-hint-box>
+    <span title>What are you talking about?</span>
+    <div answer>
+      <pre><code>describe('HttpService', () => &#123;
   let http: HttpTestingController;
+  let service: HttpService;
 
   beforeEach(() => &#123;
     TestBed.configureTestingModule(&#123;
@@ -28,56 +69,154 @@ describe('MyServiceThatIWantToTest', () => &#123;
     });
 
     http = TestBed.get(HttpTestingController);
+    service = TestBed.get(HttpService);
   });
 
-});</code></pre>
+  ...
 
-<p>
-  Note we're using <code>imports</code> here, not <code>providers</code>. What's the 
-  difference? Use <code>providers</code> to provide individual services. You can use
-  <code>imports</code> to provide entire modules.
-</p>
+  it('should make a request', () => &#123;
+    service.makeRequest().subscribe();
+    http.expectOne('/foo');
+  });
+}        
+      </code></pre>
+    </div>
+  </app-hint-box>
 
-<p>And now we're ready to test stuff!</p>
+  <p>
+    We can also check other details of the request, using the <code>request</code>
+    property of the object returned by <code>expectOne</code>.
+  </p>
 
-<h3>Testing a request was made</h3>
+  <pre><code>const details = http.expectOne('/feedback').request;</code></pre>
 
-<p>
-  We can test that a request to a specific URL was made using 
-  <code>HttpTestingController.expectOne(url)</code>. Try it out with the 
-  <code>makeRequest</code> method of the <code>HttpService</code> in 
-  <code>http.service.spec.ts</code>. (Yes, HttpService is a pretty rubbish name,
-  I really should have called it something else, but naming things is hard).
-  Don't forget you need to subscribe to the response from 
-  <code>makeRequest</code>.
-</p>
+  <p><code>expectOne</code> returns the original HTTP request that was issued.</p>
 
-<pre><code>it('should make a request', () => &#123;
-  service.makeRequest().subscribe();
-  http.expectOne('/foo');
-});</code></pre>
+  <p>
+    You can use this to check that the sendFeedback method in 
+    HTTPService is sending the correct request. You need to check that
+  </p>
 
-<p>
-  We can also check other details of the request, using the <code>request</code>
-  property of the object returned by <code>expectOne</code>.
-</p>
+  <ul>
+    <li>The HTTP method is POST</li>
+    <li>It has an Authorization header with a value of 'totes legit'. For the securities.</li>
+    <li>It is sending the following data</li>
+  </ul>
 
-<p>type of object returned by expectOne</p>
+  <pre>
+    &#123;
+      user: 'bender@planetexpress.com',
+      feedback: 'destroy all humans',
+      date: '3000-01-01'
+    }
+  </pre>
 
-<p>Check that the sendFeedback function makes a POST request.</p>
-
-<pre><code>it('should send feedback', () => &123; 
-  service.sendFeedback('great!').subscribe();
+  <app-hint-box>
+    <span title>That's a lot of things to check...</span>
+    <div answer>
+      <pre><code>
+it('should send feedback', () => &#123;
+  const feedback = &#123;
+    user: 'bender@planetexpress.com',
+    feedback: 'destroy all humans',
+    date: '1/1/3000'
+  }
+  service.sendFeedback(feedback).subscribe();
 
   const details = http.expectOne('/feedback').request;
   expect(details.method).toBe('POST');
-});</code></pre>
+  expect(details.headers.get('Authorization')).toBe('totes legit');
+  expect(details.body).toEqual(&#123;
+    user: 'bender@planetexpress.com',
+    feedback: 'destroy all humans',
+    date: '3000-01-01'
+  });
+});      
+      </code></pre>
+    </div>
+  </app-hint-box>
+</section>
 
-<p>And check that it sent the request in the correct format</p>
+<h2>Testing a request wasn't made</h2>
 
-<pre><code></code></pre>
-- check it sends the right data
-- check it doesn't make a request
-- check it doesn't make any other requests
+<section>
+  <p>
+    You can also check that a request <em>wasn't</em> made.
+    There are a couple of ways to do this.
+  </p>
+
+  <p>
+    The most explicit is to use the <code>expectNone</code> method
+    of the HttpTestingController. <code>expectNone</code> works just
+    like <code>expectOne</code>, except it checks that the call 
+    wasn't made. It's useful for situations where you want to 
+    check that a request is only made if a certain condition is met.
+  </p>
+
+  <p>
+    In our example, we want to make sure the feedback request is
+    only made if the user has supplied us with an email address.
+  </p>
+
+  <app-hint-box>
+    <span title>It wasn't not what?</span>
+    <div answer>
+      <pre><code>
+it('should not send feedback if an email isn\'t supplied', () => &#123;
+  const feedback = &#123;
+    feedback: 'bite my shiny metal ass',
+    date: '2/1/3000'
+  };
+  service.sendFeedback(feedback).subscribe();
+
+  http.expectNone('/feedback');
+});        
+      </code></pre>
+    </div>
+  </app-hint-box>
+
+  <p>
+    The other way to check that a request wasn't made is to use
+    the <code>verify()</code> method of the HttpTestingController.
+    This is more of a generic clean-up, that checks that there are 
+    no unexpected or outstanding requests.
+  </p>
+
+  <p>
+    The usual way of using it is to stick it in an <code>afterEach</code>.
+    Then, if any of your tests make an HTTP request that isn't caught by
+    an <code>expectOne</code> or a <code>match</code>, that test will fail.
+  </p>
+
+  <p>
+    I couldn't think of a good way of making this work with the lights,
+    so you can just look in the HttpService spec and see how it works I guess.
+  </p>
+</section>
+
+<h2>Testing more complicated scenarios</h2>
+
+<section>
+  <p>
+    Sometimes, you don't know what the exact URL is going to be. Or, you don't 
+    care - you're only interested in some other feature of the request, like 
+    whether it has a particular cookie, or specific request parameters. To do 
+    that, you can pass <code>expectOne</code> a function that returns a boolean
+    indicating whether or not this was the request you were expecting.
+  </p>
+
+  <pre><code>
+  </code></pre>
+</section>
+
+<h2>Sending responses</h2>
+
+<section>
+  <p></p>
+</section>
+
+<h2>Handling errors</h2>
+
+
 - given a valid response, make sure the service does the right thing
 - given an error response, make sure the service does the right thing

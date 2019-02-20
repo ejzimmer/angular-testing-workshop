@@ -19,7 +19,7 @@ body {
 
 h2, section {
   background: linear-gradient(to right, hsla(var(--blue-hue), 0%, 100%, .5) 75%, transparent);
-  box-shadow: -2px 2px 4px hsla(0, 100%, 0%, .5);
+  box-shadow: -2px 0px hsla(0, 100%, 0%, .5);
 }
 
 h2 {

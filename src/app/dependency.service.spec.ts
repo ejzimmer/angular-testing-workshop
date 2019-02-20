@@ -12,28 +12,11 @@ describe('DependencyService', () => {
     TestBed.configureTestingModule({
       providers: []
     });
-    // TestBed.configureTestingModule({
-    //   providers: [ 
-    //     // UnannotatedService,
-    //     {
-    //       provide: AnnoyingInitiationService,
-    //       useValue: {
-    //         getCombinedEmoji: () => '🇲🇶'
-    //       }
-    //     },
-    //     // {
-    //     //   provide: HelpService,
-    //     //   useValue: {
-    //     //     callForHelp: () => ''
-    //     //   }
-    //     // }
-    //   ]
-    // });
 
     service = TestBed.get(DependencyService);
   });
 
-  fit('should be created', () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 

@@ -44,6 +44,21 @@ fdescribe('HttpService', () => {
     });
   });
 
+  it('should not send feedback if an email isn\'t supplied', () => {
+    const feedback = {
+      feedback: 'bite my shiny metal ass',
+      date: '2/1/3000'
+    };
+    service.sendFeedback(feedback).subscribe();
+
+    http.expectNone('/feedback');
+  });
+
+  it('should get the weather for Melbourne', () => {
+    service.getWeather('Melbourne');
+    http.expectOne(() => true);
+  });
+
   afterEach(() => {
     http.verify();
   })
