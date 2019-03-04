@@ -186,33 +186,112 @@ it('should not send feedback if an email isn\'t supplied', () => &#123;
     The usual way of using it is to stick it in an <code>afterEach</code>.
     Then, if any of your tests make an HTTP request that isn't caught by
     an <code>expectOne</code> or a <code>match</code>, that test will fail.
+    I would recommend using this in all your test suites that are testing HTTP requests.
   </p>
 
   <p>
-    I couldn't think of a good way of making this work with the lights,
+    I couldn't think of a good way of making this work with the lights though,
     so you can just look in the HttpService spec and see how it works I guess.
   </p>
 </section>
 
-<h2>Testing more complicated scenarios</h2>
+<h2>Testing without URLs</h2>
 
 <section>
   <p>
-    Sometimes, you don't know what the exact URL is going to be. Or, you don't 
-    care - you're only interested in some other feature of the request, like 
-    whether it has a particular cookie, or specific request parameters. To do 
-    that, you can pass <code>expectOne</code> a function that returns a boolean
-    indicating whether or not this was the request you were expecting.
+    Sometimes, you're not interested in the exact URL of the request being made -
+    you just want to check that a request matching some criteria was met. To do 
+    this, you can pass a function to <code>expectOne</code>, instead of a string.
+    It will expct a request that makes the function return <code>true</code>
   </p>
 
   <pre><code>
+it('should send cookies', () => &#123;
+  myService.sendRequest().subscribe();
+  const details = http.expectOne(request => request.headers.get('Cookie').length > 0);
+});
   </code></pre>
+
+  <p>
+    Our example service has a function that checks if the user is old enough to do 
+    something. You pass in a birthday, and it calls an API. The birthday is passed in 
+    as an object with day, month and year fields. The API is expecting the birthday in 
+    the format yyyy/m/d. Your task is to test that it's sending the correct format. 
+  </p>
+
+  <app-hint-box>
+    <span title>A possible solution</span>
+    <div answer>
+      <pre><code>
+it('it should send a date, in the format month/day', () => &#123;
+  service.amIOldEnough(&#123; day: '3', month: '8', year: '1980'}).subscribe();
+  http.expectOne(request => request.url.includes('1980/8/3'));
+});
+      </code></pre>
+    </div>
+  </app-hint-box>
 </section>
 
 <h2>Sending responses</h2>
 
 <section>
-  <p></p>
+  <p>
+    Testing all these requests is all well and good, but, often, your service needs to 
+    do something with a response before it returns it, and you want to test that it's 
+    doing that correctly. In order to do that, you need a way to send back mock responses.
+    You can do this using the <code>flush</code> method of the TestRequest object returned
+    by <code>expectOne</code>
+  </p>
+
+  <pre><code>
+it('returns the bill amount', () => &#123;
+  const accountNumber = 123;
+  const response = &#123;
+    amount: 45,
+    dueDate: '2020/12/31'
+  };
+
+  service.getBillAmount(accountNumber).subscribe(response => {
+    expect(response).toBe(45);
+  });
+  const request = http.expectOne(`/billingInfo/${accountNumber}`);
+  request.flush(response);
+});
+  </code></pre>
+
+  <p>
+    You can also setup a less judgemental matcher. The <code>match</code>
+    method works much like <code>expectOne</code>, except that it doesn't 
+    expect one. It's handy if you need to deal with multiple requests to 
+    the same URL. You can pass it an exact URL, or a function, just like 
+    with <code>expectOne</code>
+  </p>
+
+  <p>
+    Imagine this <code>getTotal</code> calls a bunch of URLs and adds up 
+    the results. This is a very contrived example, obviously. 
+    <code>match</code> will return the list of requests, allowing you to
+    respond to them as you will. Unfortunately, you need to all <code>match</code>
+    <i>after</i> you make the HTTP request, so you can't put it in a 
+    <code>beforeEach</code> block, which seems like it would have been handy.
+  </p>
+
+  <pre><code>
+    it('aggregate the results', () => {
+      service.getTotal().subscribe(total => {
+        expect(total).toBe(4);
+      });
+
+      const tests = http.match(test => test.request.url.startsWith('/getNumberOf'));
+      tests.forEach(test => test.flush({ total: 2 }));
+    });
+  </code></pre>
+
+  <p>
+    I've named the return variable <code>test</code> here, rather than <code>request</code>
+    like I did previously, because I wanted to avoid having <code>request.request</code> in 
+    the match function. Obviously, you can do what you want, if you're ok with that kind of thing.
+  </p>
 </section>
 
 <h2>Handling errors</h2>

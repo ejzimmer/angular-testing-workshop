@@ -8,7 +8,6 @@ import { of } from 'rxjs';
   providedIn: 'root'
 })
 export class HttpService {
-
   constructor(private http: HttpClient) { }
 
   makeRequest() {
@@ -27,6 +26,10 @@ export class HttpService {
         'Authorization': 'totes legit'
       }
     })
+  }
+
+  amIOldEnough({ day, month, year }) {
+    return this.http.get(`/birthday/${year}/${month}/${day}`);
   }
 
   getWeather(city: string) {

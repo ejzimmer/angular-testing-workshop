@@ -54,11 +54,16 @@ fdescribe('HttpService', () => {
     http.expectNone('/feedback');
   });
 
+  it('it should send a date, in the format month/day', () => {
+    service.amIOldEnough({ day: '3', month: '8', year: '1980'}).subscribe();
+    http.expectOne(request => request.url.includes('1980/8/3'));
+  });
+
   it('should get the weather for Melbourne', () => {
     service.getWeather('Melbourne');
     http.expectOne(() => true);
   });
-
+  
   afterEach(() => {
     http.verify();
   })
