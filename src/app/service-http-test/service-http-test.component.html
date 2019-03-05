@@ -84,6 +84,17 @@
   </app-hint-box>
 
   <p>
+    A small issue with the workshop app itself - it'll only light up a green light for 
+    tests that contain an <code>expect</code> (<code>expectOne</code> doesn't count).
+    Some of these tests don't really need an <code>expect</code>, but if you want the 
+    light to light up, you'll need to stick one in somewhere. I'd probably suggest 
+    checking that the request gets made with something like
+  </p>
+
+  <pre><code>const request = http.expectOne('/foo');
+expect(request).toBeTruthy();</code></pre>
+
+  <p>
     We can also check other details of the request, using the <code>request</code>
     property of the object returned by <code>expectOne</code>.
   </p>
@@ -251,10 +262,10 @@ it('returns the bill amount', () => &#123;
     dueDate: '2020/12/31'
   };
 
-  service.getBillAmount(accountNumber).subscribe(response => {
+  service.getBillAmount(accountNumber).subscribe(response => &#123;
     expect(response).toBe(45);
   });
-  const request = http.expectOne(`/billingInfo/${accountNumber}`);
+  const request = http.expectOne(`/billingInfo/$&#123;accountNumber}`);
   request.flush(response);
 });
   </code></pre>
@@ -277,13 +288,13 @@ it('returns the bill amount', () => &#123;
   </p>
 
   <pre><code>
-    it('aggregate the results', () => {
-      service.getTotal().subscribe(total => {
+    it('aggregates the results', () => &#123;
+      service.getTotal().subscribe(total => &#123;
         expect(total).toBe(4);
       });
 
       const tests = http.match(test => test.request.url.startsWith('/getNumberOf'));
-      tests.forEach(test => test.flush({ total: 2 }));
+      tests.forEach(test => test.flush(&#123; total: 2 }));
     });
   </code></pre>
 
@@ -292,10 +303,152 @@ it('returns the bill amount', () => &#123;
     like I did previously, because I wanted to avoid having <code>request.request</code> in 
     the match function. Obviously, you can do what you want, if you're ok with that kind of thing.
   </p>
+
+  <p>
+    Your task this time is to test the <code>doINeedAJacket</code> function. The acceptance criteria 
+    for this function are
+  </p>
+  <ul>
+    <li>It should return 'yes', if the weather is cold, or rainy</li>
+    <li>It should always return 'yes' if the city is Melbourne, because you never know</li>
+    <li>It shoult return 'no' for all other types of city/weather combinations</li>
+  </ul>
+  <p>
+    The function calls an endpoint at <code>/weather?city=cityName</code> to get weather information
+    (or, I mean, you can look at the actual service to see what it does).
+  </p>
+
+  <app-hint-box>
+      <span title>Could you just get me started with one?</span>
+      <div answer>
+        <pre><code>
+it('should need a jacket if the weather is cold', () => &#123;
+  service.doINeedAJacket('Hobart').subscribe((jacket) => &#123;
+    expect(jacket).toBe('yes');
+  });
+
+  const request = http.expectOne('/weather?city=Brisbane');
+  request.flush('cold');
+});
+      </code></pre>
+      <p>
+        The other tests all follow the same pattern (except the Melbourne test).
+      </p>
+    </div>
+  </app-hint-box>
+
+  <app-hint-box>
+    <span title>What about the Melbourne test?</span>
+    <div answer>
+      <pre><code>
+it('should always need a jacket in Melbourne', () => &#123;
+  service.doINeedAJacket('Melbourne').subscribe((jacket) => &#123;
+    expect(jacket).toBe('yes');
+  });
+});      
+      </code></pre>
+    </div>
+  </app-hint-box>
+  
 </section>
 
-<h2>Handling errors</h2>
+<h2>Handling errors & non-standard responses</h2>
 
+<section>
+  <p>
+    The final thing you're likely to want to test is how your service handles error 
+    responses. You can send mock error responses by including a little more information
+    in your call to <code>flush</code>
+  </p>
 
-- given a valid response, make sure the service does the right thing
-- given an error response, make sure the service does the right thing
+  <pre><code>
+it('can handle a 404', () => &#123;
+  const errorMessage = 'These are not the droids you\'re looking for';
+
+  myService.checkDroids().subscribe(
+    okResponse => fail('should have got an error response'),
+    (errorResponse) => &#123;
+      expect(errorResponse.status).toBe(404);
+      expect(errorResponse.error).toBe(errorMessage);
+    }
+  );
+
+  const request = http.expectOne('/droids');
+  request.flush(errorMessage, &#123; status: '404', statusText: 'sadface' });
+});
+  </code></pre>
+
+  <p>
+    For some reason, a <code>statusText</code> is always required when sending 
+    a custom status, so don't forget to add thata.
+  </p>
+
+  <p>
+    You can also use this technique to test for non-200 success codes, like 
+    HTTP201 - Created. In order to read these status codes though, you need 
+    to get access to the actual HTTPResponse that was returned, not just the 
+    body of the message, which is what you usually get. You can do this by 
+    passing in <code>&#123; observe: 'response' }</code> when you make the initial
+    request.
+  </p>
+
+  <pre><code>
+createPlayer(username): Observable&lt;HttpResponse&lt;Player&gt;&gt; &#123;
+  return this.http.post&lt;Player&gt;(this.url, &#123; observe: 'response' });
+}
+  </code></pre>
+
+  <p>
+    We can then test this code, much like the error response above.
+  </p>
+
+  <pre><code>
+it('should create a player', () => &#123;
+  service.createPlayer(response => &#123;
+    expect(response.status).toBe(201);
+  });
+
+  const request = http.expectOne(url);
+  request.flush(mockPlayerDetails, &#123; status: '201', statusText: 'created' });
+})    
+  </code></pre>
+
+  <p>
+    Your final task for this section is to test the <code>isitDown</code>
+    function of our service. This function takes a URL and checks whether 
+    the site is up or not. You need to test that the service returns 
+    <code>true</code> if the site it down and <code>false</code> if it is up.
+  </p>
+
+  <app-hint-box>
+      <span title>How?</span>
+      <div answer>
+        <pre><code>
+it('should be up', () => &#123;
+  const url = 'https://github.com';
+  service.isItDown(url).subscribe(response => &#123;
+    expect(response).toBe(false);
+  });
+
+  const request = http.expectOne(url);
+  request.flush('ok');
+});
+
+it('should be down', () => &#123;
+  const url = 'https://facebook.com';
+  service.isItDown(url).subscribe(response => &#123;
+    expect(response).toBe(true);
+  });
+
+  const request = http.expectOne(url);
+  request.flush('not ok', &#123; status: 404, statusText: 'boo!' });
+});
+        </code></pre>
+      </div>
+      <p>
+        Notice that you don't need to do anything special for the first 
+        case, as <code>flush</code> returns a status of 200 by default.
+      </p>
+    </app-hint-box>
+  
+</section>

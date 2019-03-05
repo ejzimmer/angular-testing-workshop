@@ -63,7 +63,15 @@ export class ContentsComponent implements OnInit {
       tests: [
         'should be created',
         'should make a request',
-        'should send feedback'
+        'should send feedback',
+        'should not send feedback if an email isn\'t supplied', 
+        'it should send a date, in the format month/day', 
+        'should need a jacket if the weather is cold',
+        'should need a jacket if the weather is rainy',
+        'should always need a jacket in Melbourne',
+        'should not need a jacket in all other cases',
+        'should be up',
+        'should be down'
       ]
     },
     { title: 'A service with Observables' },
